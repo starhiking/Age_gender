@@ -171,7 +171,27 @@ class MiVOLO:
 
         # write gender and age results into detected_bboxes
         self.fill_in_results(output, detected_bboxes, faces_inds, bodies_inds)
+        
+    def fill_in_results_scrfd(self, scrfd_results, output):
+        age_output = output[:, 2]
+        gender_output = output[:, :2].softmax(-1)
+        gender_probs, gender_indx = gender_output.topk(1)
+        # per face
+        
+        for index in range(output.shape[0]):
+            # get_age
+            age = age_output[index].item()
+            age = age * (self.meta.max_age - self.meta.min_age) + self.meta.avg_age
+            age = round(age, 2)
 
+            #_logger.info(f"\tage: {age}")
+            if gender_probs is not None:
+                gender = "male" if gender_indx[index].item() == 0 else "female"
+                gender_score = gender_probs[index].item()
+                #_logger.info(f"\tgender: {gender} [{int(gender_score * 100)}%]")
+                
+            scrfd_results.append({"age": age, "gender": gender})
+                
     def fill_in_results(self, output, detected_bboxes, faces_inds, bodies_inds):
         if self.meta.only_age:
             age_output = output

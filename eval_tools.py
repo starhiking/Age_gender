@@ -130,8 +130,8 @@ class Metrics:
         results = OrderedDict(
             mean_inference_time=mean_per_image_time * 1e3,
             mean_preprocessing_time=mean_preprocessing_time * 1e3,
-            agetop1=round(age_top1a, 4),
-            agetop1_err=round(100 - age_top1a, 4),
+            agetop1=round(age_top1a+1e-6, 4),
+            agetop1_err=round(100 - (age_top1a+1e-6), 4),
         )
 
         if self.is_regression:
